@@ -8,8 +8,8 @@ import { getMetaValue, findElement, removeElement, insertAfter } from "../helper
 export default class extends Controller {
   static targets = [ "input" ]
   connect() { 
-    
-    this.dropZone = createDropzone(this);
+    // let dz =;
+    this.dropZone =  createDropZone(this); 
     this.hideFileInput()
     this.bindEvents()  
     Dropzone.autoDiscover = false;
@@ -46,7 +46,9 @@ export default class extends Controller {
   }
 
 
-  get headers() { return { "X-CSRF-Token": getMetaValue("csrf-token") } }
+  get headers() {
+    return { "X-CSRF-Token": getMetaValue("csrf-token") }
+  }
 
   get url() { return this.inputTarget.getAttribute("data-direct-upload-url") }
 
@@ -69,7 +71,7 @@ export default class extends Controller {
 
 class DirectUploadController {
   constructor(source, file) {
-    this.DirectUpload = createDirectUpload(file, source.url, this);
+    this.directUpload = createDirectUpload(file, source.url, this);
     this.source = source;
     this.file = file;
   }
@@ -77,6 +79,8 @@ class DirectUploadController {
   start() {
     this.file.controller = this;
     this.hiddenInput = this.createHiddenInput();
+ 
+    
     this.directUpload.create((error, attributes) => {
       if (error) {
         removeElement(this.hiddenInput);
@@ -102,7 +106,7 @@ class DirectUploadController {
 
   bindProgressEvent(xhr) {
     this.xhr = xhr;
-    this.xhr.upload.addEventlistener("progress", (event) => {
+    this.xhr.upload.addEventListener("progress", (event) => {
       this.uploadRequestDidProgress(event)
     })
   }
@@ -136,6 +140,8 @@ class DirectUploadController {
 }
 
 
+
+// Top Level
 function createDirectUploadController(source, file) {
   return new DirectUploadController(source, file)
 }
@@ -144,17 +150,14 @@ function createDirectUpload(file,url,controller) {
   return new DirectUpload(file, url, controller)
 }
 
-function createDropzone(controller) {
-  let dropzone = new Dropzone(controller.element, {
+function createDropZone(controller) {
+  return new Dropzone(controller.element, {
     url: controller.url,
     headers: controller.headers,
     maxFiles: controller.maxFiles,
     maxFilesize: controller.maxFileSize,
     acceptedFiles: controller.acceptedFiles,
     addRemoveLinks: controller.addRemoveLinks,
-    uploadMultiple: controller.uploadMultiple,
     autoQueue: false
-  })
-  console.log
-  return dropzone
-}
+  }) 
+} 

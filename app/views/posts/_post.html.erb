@@ -3,6 +3,10 @@
     <strong>Title:</strong>
     <%= post.title %>
   </p>
+<% post.images.each do |img| %>
+  <%= image_tag(img, style: "width: 300px; height: auto") %>
+<% end %>
+  
 
   <p>
     <strong>Body:</strong>
